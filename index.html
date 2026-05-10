@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Multiestudios – Tutor Inteligente para Especialistas Policiales (Derecho)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f6f9; color: #333; }
+    .whatsapp-float {
+      position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+      width: 60px; height: 60px; background-color: #25D366; border-radius: 50%;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: transform 0.2s;
+    }
+    .whatsapp-float:hover { transform: scale(1.1); }
+    .whatsapp-float a { color: white; text-decoration: none; font-size: 30px; line-height: 1; }
+    .footer {
+      text-align: center; padding: 1rem; background: #004d40; color: white;
+      font-size: 0.9rem; position: fixed; bottom: 0; width: 100%; z-index: 999;
+    }
+    .access-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; background: linear-gradient(135deg, #004d40, #00695c);
+      padding-bottom: 4rem;
+    }
+    .access-card {
+      background: white; padding: 3rem 2rem; border-radius: 1rem; box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      text-align: center; width: 90%; max-width: 450px; margin: 2rem 0;
+    }
+    .access-card h1 { color: #004d40; margin-bottom: 0.2rem; font-size: 2rem; }
+    .access-card .subtitle { color: #7f8c8d; margin-bottom: 0.5rem; }
+    .access-card .lema { color: #555; margin-bottom: 2rem; font-style: italic; }
+    .access-card select, .access-card input {
+      width: 100%; padding: 0.8rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+    .btn {
+      background: #004d40; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem;
+      font-size: 1rem; cursor: pointer; transition: background 0.3s; width: 100%; margin-top: 0.5rem;
+    }
+    .btn:hover { background: #00695c; }
+    .btn.secondary { background: #607d8b; }
+    .btn.muestra { background: #c9a84c; color: #004d40; font-weight: bold; }
+    .btn.muestra:hover { background: #d4af5e; }
+    .error-msg { color: #c62828; margin-top: 0.5rem; font-weight: bold; }
+    .main-panel { display: none; padding: 2rem; max-width: 1100px; margin: 0 auto; padding-bottom: 5rem; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .header h2 { color: #004d40; }
+    .logout-btn { background: #b71c1c; color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 0.3rem; cursor: pointer; }
+    .section { background: white; border-radius: 0.8rem; padding: 1.8rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .section h3 { color: #004d40; margin-bottom: 1rem; border-bottom: 2px solid #004d40; padding-bottom: 0.4rem; }
+    .temario-list { max-height: 400px; overflow-y: auto; padding: 0.5rem; background: #fafafa; border-radius: 0.4rem; }
+    .temario-item { padding: 0.7rem; border-bottom: 1px solid #e0e0e0; cursor: pointer; }
+    .temario-item:hover { background: #e0f2f1; }
+    .case-box, .model-answer-box, .feedback-box { margin-top: 1rem; }
+    textarea { width: 100%; height: 200px; padding: 0.8rem; border: 1px solid #ccc; border-radius: 0.5rem; resize: vertical; font-size: 0.95rem; }
+    .loading { text-align: center; color: #004d40; margin: 1rem 0; }
+    .btn-group { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+    .btn-group .btn { width: auto; }
+    pre { white-space: pre-wrap; background: #f5f5f5; padding: 1rem; border-radius: 0.5rem; }
+    .modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center;
+    }
+    .modal-content {
+      background: white; border-radius: 1rem; padding: 2rem; max-width: 700px; width: 90%;
+      max-height: 80vh; overflow-y: auto; position: relative;
+    }
+    .modal-content h3 { color: #004d40; margin-bottom: 1rem; }
+    .close-modal {
+      position: absolute; top: 1rem; right: 1.2rem; font-size: 1.5rem; cursor: pointer;
+      color: #555; background: none; border: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="whatsapp-float">
+  <a href="https://wa.me/593996328491" target="_blank" title="Contactar por WhatsApp">💬</a>
+</div>
+
+<div class="footer">
+  Powered by Physics – 0995324419 &nbsp;|&nbsp; © 2026 Multiestudios
+</div>
+
+<div id="modalMuestra" class="modal">
+  <div class="modal-content">
+    <button class="close-modal" id="closeModalBtn">&times;</button>
+    <h3>Caso Práctico de Muestra (Derecho)</h3>
+    <div id="muestraContent"></div>
+  </div>
+</div>
+
+<div id="accessScreen" class="access-screen">
+  <div class="access-card">
+    <h1>MULTIESTUDIOS</h1>
+    <p class="subtitle">Centro de Educación Continua</p>
+    <p class="lema">Tutor Inteligente para Postulantes a Especialistas de la Policía Nacional en el Área Jurídica</p>
+    <input type="text" id="cedulaInput" placeholder="Número de cédula" />
+    <select id="carreraSelect">
+      <option value="">Seleccione carrera</option>
+      <option>Derecho</option>
+    </select>
+    <button class="btn" id="btnIngresar">Ingresar</button>
+    <button class="btn muestra" id="btnMuestra">📋 Ver caso práctico de muestra</button>
+    <div id="loginError" class="error-msg"></div>
+  </div>
+</div>
+
+<div id="mainPanel" class="main-panel">
+  <div class="header">
+    <h2>Panel del Aspirante – <span id="careerDisplay"></span></h2>
+    <button class="logout-btn" id="btnLogout">Cerrar sesión</button>
+  </div>
+
+  <div class="section">
+    <h3>Temario de 50 temas – <span id="careerTemarioTitle"></span></h3>
+    <input type="text" id="searchTema" placeholder="Buscar tema..." style="width:100%; padding:0.5rem; margin-bottom:0.5rem;" onkeyup="App.filterTemas()" />
+    <div id="temarioContainer" class="temario-list"></div>
+  </div>
+
+  <div class="section">
+    <h3>Caso Práctico</h3>
+    <div id="caseContent" class="case-box">Presione "Crear caso práctico" para comenzar.</div>
+    <div class="btn-group">
+      <button class="btn" id="btnCasoBanco">Crear caso práctico (banco)</button>
+      <button class="btn secondary" id="btnCasoIA">Nuevo caso con IA</button>
+    </div>
+    <div id="caseLoading" class="loading" style="display:none;">Generando caso, por favor espere...</div>
+  </div>
+
+  <div class="section">
+    <h3>Tu Respuesta</h3>
+    <textarea id="userAnswer" placeholder="Escribe aquí tu respuesta jurídica detallada..."></textarea>
+  </div>
+
+  <div class="section">
+    <h3>Solución y Retroalimentación</h3>
+    <div class="btn-group">
+      <button class="btn" id="btnVerRespuesta">Ver respuesta técnica</button>
+      <button class="btn secondary" id="btnRevisar">Revisar mi respuesta (IA)</button>
+    </div>
+    <div id="modelAnswerBox" class="model-answer-box" style="display:none;">
+      <h4>Respuesta técnica:</h4>
+      <div id="modelAnswerContent"></div>
+    </div>
+    <div id="feedbackBox" class="feedback-box" style="display:none;">
+      <h4>Evaluación de tu respuesta:</h4>
+      <div id="feedbackContent"></div>
+    </div>
+    <div id="feedbackLoading" class="loading" style="display:none;">Analizando tu respuesta, espera unos segundos...</div>
+  </div>
+</div>
+
+<script>
+const App = {
+  API_KEY: 'sk-5be59b1373ae48dfb7a39e9b2e5b5a46',
+  API_URL: 'https://api.deepseek.com/v1/chat/completions',
+  MODEL: 'deepseek-chat',
+  currentUser: null,
+  currentCase: null,
+  modelAnswerVisible: false,
+  temasActuales: [],
+  usuarios: [
+    { cedula: '1788888888', carrera: 'Derecho' }
+  ]
+};
+
+// ==================== TEMARIO COMPLETO DE 50 TEMAS (DERECHO POLICIAL) ====================
+App.temarios = {
+  'Derecho': [
+    "1. El debido proceso en la actuación policial: fundamentos constitucionales.",
+    "2. Garantías básicas del detenido (derechos en aprehensión y retención).",
+    "3. Control de legalidad de allanamientos y registros sin orden judicial.",
+    "4. Uso legítimo de la fuerza policial: principios de proporcionalidad y necesidad.",
+    "5. Derechos humanos en operativos policiales: estándares internacionales aplicables.",
+    "6. Responsabilidad penal del servidor policial por actos arbitrarios.",
+    "7. Procedimiento disciplinario policial: faltas, sanciones y recursos.",
+    "8. El hábeas corpus como garantía frente a detenciones ilegales.",
+    "9. Acción de protección contra actuaciones policiales vulneradoras de derechos.",
+    "10. Prueba ilícita: exclusión de evidencias obtenidas con violación de derechos fundamentales.",
+    "11. Cadena de custodia de evidencias: normativa legal y protocolos.",
+    "12. El fiscal y la policía: coordinación en la investigación penal.",
+    "13. Medidas cautelares personales (prisión preventiva, sustitutivas) y control policial.",
+    "14. Flagrancia: concepto, procedimiento y límites legales.",
+    "15. Procedimiento para contravenciones de tránsito y rol de la policía.",
+    "16. Violencia intrafamiliar: competencias policiales y medidas de protección.",
+    "17. Protección integral a víctimas y testigos en el sistema penal.",
+    "18. Justicia penal juvenil: procedimiento especial y participación policial.",
+    "19. Extinción de dominio: base legal y apoyo policial.",
+    "20. Régimen legal de armas, municiones y explosivos.",
+    "21. Control de sustancias sujetas a fiscalización: normativa y procedimientos.",
+    "22. Migración y extranjería: facultades de control policial.",
+    "23. Sistema de contratación pública (LOSNCP) para bienes y servicios policiales.",
+    "24. Contratación administrativa de personal policial: derechos y deberes.",
+    "25. Responsabilidad civil del Estado por actos de servidores policiales.",
+    "26. El Código Orgánico Administrativo (COA) y su aplicación en la Policía Nacional.",
+    "27. Régimen disciplinario de la Policía Nacional (Ley Orgánica de la Policía).",
+    "28. Derecho a la salud del personal policial y su familia (ISSFA, IESS).",
+    "29. Seguridad social del policía: pensiones, jubilación y riesgos profesionales.",
+    "30. Acceso a la información pública (LOTAIP) y transparencia policial.",
+    "31. Protección de datos personales en bases de datos policiales.",
+    "32. Delitos informáticos: competencias de la unidad policial especializada.",
+    "33. Cibercrimen y evidencia digital: aspectos legales y cadena de custodia.",
+    "34. Interceptación de comunicaciones: requisitos constitucionales y legales.",
+    "35. Agentes encubiertos y técnicas especiales de investigación: marco legal.",
+    "36. Cooperación judicial internacional en materia penal.",
+    "37. Trata de personas y tráfico ilícito de migrantes: tipificación penal.",
+    "38. Delitos de odio y discriminación: abordaje policial y judicial.",
+    "39. Delitos ambientales: competencias de la Policía Nacional.",
+    "40. Corrupción en la función policial: tipificación, investigación y sanción.",
+    "41. El principio de oportunidad en el COIP y su aplicación a casos policiales.",
+    "42. Conciliación y acuerdos reparatorios en delitos de menor lesividad.",
+    "43. Juicio penal oral: roles de fiscal, defensa y policía en estrado.",
+    "44. Impugnación de sentencias: recursos y control constitucional.",
+    "45. La Corte Interamericana de Derechos Humanos y la doctrina policial.",
+    "46. Debida motivación de informes y partes policiales con valor probatorio.",
+    "47. Ética profesional del abogado asesor de la Policía Nacional.",
+    "48. Responsabilidad del abogado policial: faltas disciplinarias y penales.",
+    "49. Arbitraje y mediación en conflictos que involucran a la Policía.",
+    "50. Planificación estratégica legal en la institución policial."
+  ]
+};
+
+// ==================== CASO PRECARGADO (SIN ALUCINACIONES Y CON DOCTRINA POLICIAL) ====================
+App.casosBanco = {
+  'Derecho': {
+    enunciado: "Durante un operativo de control en el sector de la Mariscal, agentes policiales ingresan a un departamento sin orden judicial porque 'escucharon gritos de auxilio'. Dentro encuentran una fiesta particular con varias personas consumiendo bebidas alcohólicas y una pequeña cantidad de marihuana (10 gramos). Los agentes detienen a todos los asistentes. El abogado de uno de los detenidos interpone una acción de protección alegando vulneración del derecho a la inviolabilidad del domicilio. Usted es el asesor jurídico de la unidad policial. Debe emitir un criterio legal motivado.",
+    preguntas: [
+      "1. ¿Es constitucionalmente válido el allanamiento sin orden judicial basado en 'gritos de auxilio'? Fundamente con los principios aplicables.",
+      "2. ¿Qué recurso o acción constitucional procede contra la detención masiva? Explique brevemente el procedimiento.",
+      "3. ¿Qué recomendaciones daría al comando policial para futuros operativos, integrando la doctrina de legalidad y autogestión?"
+    ],
+    solucion: "1. El artículo 66, numeral 29 de la Constitución ecuatoriana protege la inviolabilidad del domicilio. Excepcionalmente se puede ingresar sin orden judicial en casos de flagrancia o para evitar un peligro grave e inminente. Los 'gritos de auxilio' podrían constituir una situación de emergencia que justifique el ingreso si se acredita que existía un riesgo real para la vida o integridad de una persona. Sin embargo, una vez dentro, si no se encuentra delito flagrante (solo consumo de alcohol y marihuana en cantidad que no supera la tenencia para consumo personal – 10 gramos puede considerarse dosis máxima según la Ley Orgánica de Drogas), las detenciones masivas serían desproporcionadas. Se debe consultar la normativa vigente sobre dosis máximas.\n2. Procede la acción de protección (art. 88 de la Constitución) contra actos u omisiones de autoridad que vulneren derechos constitucionales, especialmente por detenciones arbitrarias. También puede interponerse hábeas corpus (art. 89) para resolver sobre la legalidad de la privación de libertad. El procedimiento es sumario y debe ser conocido por una jueza o juez constitucional.\n3. Recomendaciones: a) Capacitar al personal en las excepciones constitucionales al principio de inviolabilidad del domicilio. b) Documentar cualquier ingreso de emergencia con un informe detallado y la grabación de cámara corporal. c) En caso de duda, abstenerse de detener masivamente; solo retener a quienes evidencia clara de participación en delito flagrante. d) Activar el protocolo de coordinación con fiscalía antes de ejecutar allanamientos. La autogestión implica que los mandos revisen periódicamente estos criterios con el equipo legal."
+  }
+};
+
+App.muestraCaso = App.casosBanco['Derecho'];
+
+// ==================== FUNCIONES DE INTERFAZ Y LÓGICA (idénticas a versión social, adaptadas) ====================
+App.mostrarAcceso = function() {
+  document.getElementById('accessScreen').style.display = 'flex';
+  document.getElementById('mainPanel').style.display = 'none';
+  document.getElementById('cedulaInput').value = '';
+  document.getElementById('carreraSelect').value = '';
+  document.getElementById('loginError').textContent = '';
+};
+
+App.mostrarPanel = function() {
+  document.getElementById('accessScreen').style.display = 'none';
+  document.getElementById('mainPanel').style.display = 'block';
+  document.getElementById('careerDisplay').textContent = App.currentUser.carrera;
+  document.getElementById('careerTemarioTitle').textContent = App.currentUser.carrera;
+  App.resetearCaso();
+  document.getElementById('userAnswer').value = '';
+  document.getElementById('modelAnswerBox').style.display = 'none';
+  document.getElementById('feedbackBox').style.display = 'none';
+  App.cargarTemario();
+};
+
+App.resetearCaso = function() {
+  App.currentCase = null;
+  document.getElementById('caseContent').innerHTML = 'Presione "Crear caso práctico" para comenzar.';
+  document.getElementById('modelAnswerBox').style.display = 'none';
+  document.getElementById('feedbackBox').style.display = 'none';
+  App.modelAnswerVisible = false;
+};
+
+App.login = function() {
+  const cedula = document.getElementById('cedulaInput').value.trim();
+  const carrera = document.getElementById('carreraSelect').value;
+  const errorDiv = document.getElementById('loginError');
+  errorDiv.textContent = '';
+  if (!cedula || !carrera) {
+    errorDiv.textContent = 'Complete todos los campos.';
+    return;
+  }
+  const encontrado = App.usuarios.find(u => u.cedula === cedula && u.carrera === carrera);
+  if (encontrado) {
+    App.currentUser = encontrado;
+    App.mostrarPanel();
+  } else {
+    errorDiv.textContent = 'Cédula o carrera no autorizada. Pruebe con cédula: 1788888888';
+  }
+};
+
+App.logout = function() {
+  App.currentUser = null;
+  App.mostrarAcceso();
+};
+
+App.cargarTemario = function() {
+  App.temasActuales = App.temarios[App.currentUser.carrera] || [];
+  App.renderizarTemario();
+};
+
+App.renderizarTemario = function(filtro = '') {
+  const container = document.getElementById('temarioContainer');
+  const filtrados = App.temasActuales.filter(t => t.toLowerCase().includes(filtro.toLowerCase()));
+  container.innerHTML = filtrados.map(t => `<div class="temario-item">${t}</div>`).join('');
+};
+
+App.filterTemas = function() {
+  const texto = document.getElementById('searchTema').value;
+  App.renderizarTemario(texto);
+};
+
+App.loadCaseFromBank = async function() {
+  if (!App.currentUser) return;
+  const caso = App.casosBanco[App.currentUser.carrera];
+  if (!caso) {
+    document.getElementById('caseContent').innerHTML = 'No hay caso precargado para esta carrera. Use "Nuevo caso con IA".';
+    App.currentCase = null;
+    return;
+  }
+  App.currentCase = caso;
+  App.displayCase(caso);
+};
+
+App.displayCase = function(caseObj) {
+  const html = `
+    <p><strong>Contexto operacional:</strong></p>
+    <p>${caseObj.enunciado}</p>
+    <p><strong>Preguntas:</strong></p>
+    <ol>${caseObj.preguntas.map(p => `<li>${p}</li>`).join('')}</ol>
+  `;
+  document.getElementById('caseContent').innerHTML = html;
+  document.getElementById('modelAnswerBox').style.display = 'none';
+  document.getElementById('feedbackBox').style.display = 'none';
+  App.modelAnswerVisible = false;
+};
+
+App.sanitizeJSON = function(str) {
+  let result = '';
+  let inString = false;
+  let escaped = false;
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (escaped) { result += c; escaped = false; continue; }
+    if (c === '\\' && inString) { escaped = true; result += c; continue; }
+    if (c === '"') { inString = !inString; result += c; continue; }
+    if (inString && c.charCodeAt(0) < 0x20) {
+      if (c === '\n') result += '\\n';
+      else if (c === '\r') result += '\\r';
+      else if (c === '\t') result += '\\t';
+      else result += '\\u' + ('000' + c.charCodeAt(0).toString(16)).slice(-4);
+    } else {
+      result += c;
+    }
+  }
+  return result;
+};
+
+// Generación de caso con IA (instrucciones anti‑alucinación jurídica)
+App.generateCaseWithAI = async function() {
+  if (!App.currentUser) return;
+  document.getElementById('caseLoading').style.display = 'block';
+  try {
+    if (!App.temasActuales || App.temasActuales.length === 0) {
+      throw new Error('No hay temario disponible. Recargue la página.');
+    }
+    const indice = Math.floor(Math.random() * App.temasActuales.length);
+    const temaSeleccionado = App.temasActuales[indice];
+    console.log(`Tema seleccionado aleatoriamente (#${indice+1}): ${temaSeleccionado}`);
+
+    const prompt = `Eres un experto en derecho policial y constitucional ecuatoriano. Genera un caso práctico para un especialista en Derecho que asesora a la Policía Nacional. El caso debe centrarse EXCLUSIVAMENTE en el siguiente tema del temario:\n\n"${temaSeleccionado}"\n\n
+      IMPORTANTE - INSTRUCCIONES ESTRICTAS:
+      1. NO inventes números de artículos de ninguna ley (Constitución, COIP, LOSNCP, etc.), ni códigos, ni jurisprudencia falsa.
+      2. Si necesitas hacer referencia a una norma, describe su contenido o aplicabilidad sin dar números exactos, por ejemplo: "según la Constitución ecuatoriana, el debido proceso incluye..." o "de acuerdo con el COIP (consultar la disposición sobre flagrancia)".
+      3. No proporciones números de artículos a menos que estés absolutamente seguro (si no, omítelos y describe el principio general).
+      4. Integra explícitamente la doctrina policial de LEGALIDAD, DEBIDO PROCESO y AUTOGESTIÓN JURÍDICA en el contexto, las preguntas y la solución.
+      5. Si no recuerdas un dato exacto (como plazos o nombres de recursos), indica que se debe consultar la fuente oficial o el COIP vigente.
+      Proporciona un contexto operacional realista, 3 preguntas técnicas y la respuesta técnica detallada (máx. 500 palabras). Devuelve JSON con: "enunciado", "preguntas" (array de strings), "solucion". Solo el objeto JSON, sin texto adicional.`;
+
+    const response = await App.callDeepSeek([
+      { role: 'system', content: 'Eres un generador de casos prácticos de derecho para la Policía Nacional. Cumple estrictamente las instrucciones: no alucines leyes ni números de artículos; integra doctrina policial; si no sabes un dato exacto, describe el procedimiento o indica consultar fuente oficial. Responde SOLO con un objeto JSON válido, sin markdown.' },
+      { role: 'user', content: prompt }
+    ], 0.5, 8000);
+
+    let jsonStr = response.trim();
+    const fenceMatch = jsonStr.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+    if (fenceMatch) { jsonStr = fenceMatch[1].trim(); }
+    const firstBrace = jsonStr.indexOf('{');
+    if (firstBrace > 0) { jsonStr = jsonStr.substring(firstBrace); }
+
+    jsonStr = App.sanitizeJSON(jsonStr);
+    const caseData = JSON.parse(jsonStr);
+
+    if (caseData.enunciado && caseData.preguntas && caseData.solucion) {
+      App.currentCase = caseData;
+      App.displayCase(caseData);
+    } else {
+      throw new Error('El JSON no contiene los campos requeridos.');
+    }
+  } catch (e) {
+    console.error(e);
+    document.getElementById('caseContent').innerHTML = `<p>Error al generar caso con IA. ${e.message}</p>`;
+    App.currentCase = null;
+  } finally {
+    document.getElementById('caseLoading').style.display = 'none';
+  }
+};
+
+App.showModelAnswer = function() {
+  if (!App.currentCase) { alert('Primero debe crear un caso práctico.'); return; }
+  const box = document.getElementById('modelAnswerBox');
+  document.getElementById('modelAnswerContent').innerHTML = `<pre>${App.currentCase.solucion}</pre>`;
+  box.style.display = 'block';
+  document.getElementById('feedbackBox').style.display = 'none';
+  App.modelAnswerVisible = true;
+};
+
+// Evaluación con instrucciones anti‑alucinación y doctrina jurídica
+App.reviewMyAnswer = async function() {
+  if (!App.currentCase) { alert('No hay caso práctico activo.'); return; }
+  const userText = document.getElementById('userAnswer').value.trim();
+  if (!userText) { alert('Escriba su respuesta antes de solicitar revisión.'); return; }
+  if (!App.modelAnswerVisible) {
+    alert('Primero haga clic en "Ver respuesta técnica".');
+    return;
+  }
+  document.getElementById('feedbackLoading').style.display = 'block';
+  document.getElementById('feedbackBox').style.display = 'none';
+  try {
+    const prompt = `Eres un instructor evaluador de derecho policial de la Policía Nacional del Ecuador. Evalúa la respuesta del aspirante a especialista en ${App.currentUser.carrera}.
+
+    Caso práctico:
+    ${App.currentCase.enunciado}
+
+    Preguntas:
+    ${App.currentCase.preguntas.join('\n')}
+
+    Respuesta modelo (de referencia):
+    ${App.currentCase.solucion}
+
+    Respuesta del aspirante:
+    ${userText}
+
+    INSTRUCCIONES ESTRICTAS PARA LA EVALUACIÓN:
+    - Señala aciertos y errores concretos, con tono constructivo y profesional.
+    - Si el aspirante cita un número de artículo de la Constitución, COIP, LOES, LOSNCP, o cualquier código que parezca inventado o que no se corresponda con la realidad, indícalo claramente y sugiere no inventar referencias. Recomienda describir el procedimiento o consultar la fuente oficial.
+    - Tú mismo, como evaluador, NO debes inventar números de leyes, artículos o jurisprudencia. Si necesitas hacer referencia, usa frases como "de acuerdo con la Constitución ecuatoriana" o "según el COIP vigente (se debe consultar el artículo correspondiente)".
+    - Incorpora la doctrina policial (legalidad, debido proceso, autogestión jurídica) en la retroalimentación cuando sea relevante.
+    - Sugiere qué temas del temario oficial debería repasar el aspirante para mejorar.
+    - Máximo 500 palabras.`;
+
+    const feedback = await App.callDeepSeek([
+      { role: 'system', content: 'Eres un instructor evaluador de derecho. No alucines números de leyes, artículos o jurisprudencia. Si el aspirante inventa referencias, señálalo. Sé constructivo y didáctico. Responde en texto claro.' },
+      { role: 'user', content: prompt }
+    ], 0.7, 3000);
+    document.getElementById('feedbackContent').innerHTML = `<pre style="white-space: pre-wrap;">${feedback}</pre>`;
+    document.getElementById('feedbackBox').style.display = 'block';
+  } catch (e) {
+    document.getElementById('feedbackContent').innerHTML = `<p style="color:red;">Error al obtener evaluación: ${e.message}</p>`;
+    document.getElementById('feedbackBox').style.display = 'block';
+  } finally {
+    document.getElementById('feedbackLoading').style.display = 'none';
+  }
+};
+
+App.callDeepSeek = async function(messages, temperature = 0.7, maxTokens = 2000) {
+  const resp = await fetch(App.API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${App.API_KEY}` },
+    body: JSON.stringify({ model: App.MODEL, messages, temperature, max_tokens: maxTokens })
+  });
+  if (!resp.ok) { const errBody = await resp.text(); throw new Error(`API error ${resp.status}: ${errBody}`); }
+  const data = await resp.json();
+  return data.choices[0].message.content;
+};
+
+App.mostrarMuestra = function() {
+  const modal = document.getElementById('modalMuestra');
+  const content = document.getElementById('muestraContent');
+  content.innerHTML = `
+    <p><strong>Contexto operacional (con doctrina policial):</strong></p>
+    <p>${App.muestraCaso.enunciado}</p>
+    <p><strong>Preguntas:</strong></p>
+    <ol>${App.muestraCaso.preguntas.map(p => `<li>${p}</li>`).join('')}</ol>
+    <p><strong>Respuesta técnica:</strong></p>
+    <pre>${App.muestraCaso.solucion}</pre>
+    <p style="margin-top:1rem; font-size:0.85rem;"><em>Este caso de muestra integra la doctrina policial de legalidad, debido proceso y autogestión, y evita referencias inventadas a leyes o normas.</em></p>
+  `;
+  modal.style.display = 'flex';
+};
+
+App.cerrarModal = function() {
+  document.getElementById('modalMuestra').style.display = 'none';
+};
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('btnIngresar').addEventListener('click', App.login);
+  document.getElementById('btnLogout').addEventListener('click', App.logout);
+  document.getElementById('btnCasoBanco').addEventListener('click', App.loadCaseFromBank);
+  document.getElementById('btnCasoIA').addEventListener('click', App.generateCaseWithAI);
+  document.getElementById('btnVerRespuesta').addEventListener('click', App.showModelAnswer);
+  document.getElementById('btnRevisar').addEventListener('click', App.reviewMyAnswer);
+  document.getElementById('btnMuestra').addEventListener('click', App.mostrarMuestra);
+  document.getElementById('closeModalBtn').addEventListener('click', App.cerrarModal);
+  window.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalMuestra')) App.cerrarModal();
+  });
+  App.mostrarAcceso();
+});
+</script>
+</body>
+</html>
