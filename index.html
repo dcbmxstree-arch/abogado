@@ -507,7 +507,7 @@ App.generateCaseWithAI = async function() {
     const response = await App.callDeepSeek([
       { role: 'system', content: 'Eres un generador de casos prácticos jurídicos para la Policía Nacional. No alucines leyes, artículos o jurisprudencia. Si no sabes un dato exacto, describe el procedimiento o indica consultar fuente oficial. Responde SOLO con un objeto JSON válido, sin markdown.' },
       { role: 'user', content: prompt }
-    ], 0.5, 8000);
+    ], 0.5, 9000);
 
     let jsonStr = response.trim();
     const fenceMatch = jsonStr.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
@@ -567,7 +567,7 @@ App.reviewMyAnswer = async function() {
     const feedback = await App.callDeepSeek([
       { role: 'system', content: 'Instructor evaluador. No alucines leyes ni jurisprudencia. Sé didáctico.' },
       { role: 'user', content: prompt }
-    ], 0.7, 3000);
+    ], 0.7, 4000);
     document.getElementById('feedbackContent').innerHTML = `<pre style="white-space: pre-wrap;">${feedback}</pre>`;
     document.getElementById('feedbackBox').style.display = 'block';
   } catch (e) {
